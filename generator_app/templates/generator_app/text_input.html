@@ -16,10 +16,15 @@ No text for use in generation was entered yet!
 <form action="{% url 'generator_app:submit_input' %}" method="post" id='form'>
     {% csrf_token %}
     <label for="typed_text">Enter text here:</label><br>
-    <textarea rows = "5" cols = "60" name = "typed_text" id="typed_text"></textarea>
+    <textarea rows = "8" cols = "80" name = "typed_text" id="typed_text"></textarea>
     <br><br>
+
+    <input type="checkbox" id="separate_comas" name="separate_comas" value="separate_comas" checked>
+    <label for="separate_comas">Count punctuation as separate words</label>
+    <br>
+
     <input type="submit" value="Submit">
 </form>
 
 <br><br>
-<a href="{% url 'generator_app:clear_session' %}">Clear data</a>
+<a href="{% url 'generator_app:clear_session' %}">Clear all data</a>
