@@ -1,0 +1,37 @@
+<h1>Generator</h1>
+
+<br>
+Start of the text used for generation: {{ entered_text_start }}
+<br>
+
+<form action="{% url 'generator_app:generate_text' %}" method="post" id='form'>
+    {% csrf_token %}
+    <label for="prompt">Input a text prompt, or leave empty for a random prompt:</label><br>
+
+    <textarea rows = "3" cols = "30" name = "prompt" id="prompt" placeholder="enter prompt here...">{{ last_prompt }}</textarea>
+    
+    <br><br>
+
+    <label for="length">Input maximum generated text length:</label>
+    <input type="number" id="text_length" name="text_length" min="1" max="500" value="{{ text_length }}" required>
+    <br><br>
+
+    <label for="length">Input key length (advanced):</label>
+    <input type="number" id="key_length" name="key_length" min="1" max="{{ max_key_length }}" value="{{ key_length }}" required>
+    <br><br>
+
+    <input type="submit" value="Generate">
+</form>
+
+<br><br>
+<label for="generated">Generated text:</label><br>
+<textarea rows = "10" cols = "60" name = "generated" id="generated" disabled>{{ generated_text }}</textarea>
+
+<br>
+
+{% if stop_reason %}
+Reason for stopping generation: {{ stop_reason }}
+{% endif %}
+
+<br><br>
+<a href="{% url 'generator_app:homepage' %}">Go back to homepage</a>

@@ -1,0 +1,18 @@
+<h1>Substring counting</h1>
+Start of the entered text:<br>
+<input type="text" name="text_start" id="text_start" value="{{ text_start }}" disabled>
+<br><br>
+
+<form action="{% url 'generator_app:count_substrings' %}" method="post" id='form'>
+    {% csrf_token %}
+    Enter substring to look for:<br>
+    <input type="text" name="substring" id="substring" required>
+    <br>
+    <input type="submit" name="submit" id="submit" value="count occurances">
+</form>
+
+<br><br>
+Substring occurances: {{occurance_count}}
+<br><br>
+
+<a href="{% url 'generator_app:text_input' %}">Go back to text input</a>

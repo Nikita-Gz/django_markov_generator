@@ -1,0 +1,25 @@
+<h1>Input text to be used for generation</h1>
+<br><br>
+
+{% if entered_text_start %}
+Start of the text currently used for generation: {{ entered_text_start }}
+<br>
+Go to the <a href="{% url 'generator_app:generator_page' %}">generator page</a>
+{% else %}
+No text for use in generation was entered yet!
+{% endif %}
+
+<br><br>
+
+{% if error_message %}<p style="color:rgb(255,0,0);"><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'generator_app:submit_input' %}" method="post" id='form'>
+    {% csrf_token %}
+    <label for="typed_text">Enter text here:</label><br>
+    <textarea rows = "5" cols = "60" name = "typed_text" id="typed_text"></textarea>
+    <br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<br><br>
+<a href="{% url 'generator_app:clear_session' %}">Clear data</a>
