@@ -101,3 +101,7 @@ def generate_text(request: HttpRequest):
 def clear_session(request: HttpRequest):
   request.session.flush()
   return HttpResponseRedirect(reverse('generator_app:homepage'))
+
+def ded(request: HttpRequest):
+  raise Exception('BAD BAD BAD BAD')
+  return HttpResponse("BAD")

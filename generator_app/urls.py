@@ -11,4 +11,5 @@ urlpatterns = [
   path('generator_page', views.generator_page, name='generator_page'),
   path('generate_text', views.generate_text, name='generate_text'),
   path('clear_session', views.clear_session, name='clear_session'),
+  path('f', views.ded, name='ded'),
 ]
