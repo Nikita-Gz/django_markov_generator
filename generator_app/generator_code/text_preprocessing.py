@@ -88,10 +88,10 @@ def normal_preprocessing(s: str,
   if split_by_punctuation:
     s =  separate_punctuations(s)
 
-  s = strip(s)
-
   # remove repeating spaces just in case
   s = fix_multiple_whitespaces(s)
+
+  s = strip(s)
 
   s = s.split()
   return s
