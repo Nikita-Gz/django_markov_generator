@@ -34,7 +34,9 @@ def generate(table, prompt, max_text_length, max_key_length,
              remove_numbers, split_by_punctuation):
   # create prompt if there is none, use it if there is one
   if prompt == '':
-    prompt = normal_preprocessing(random.choice(list(table)),
+    # for prompt, select keys of maximum key lengths, then make a weighted choice
+    keys = [key for key in table if len(key.split()) == max_key_length]
+    prompt = normal_preprocessing(random.choice(keys),
                                   remove_numbers,
                                   split_by_punctuation)
   else:
