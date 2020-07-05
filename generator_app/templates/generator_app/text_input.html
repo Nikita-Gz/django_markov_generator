@@ -19,10 +19,16 @@ No text for use in generation was entered yet!
     <textarea rows = "8" cols = "80" name = "typed_text" id="typed_text"></textarea>
     <br><br>
 
-    <input type="checkbox" id="separate_comas" name="separate_comas" value="separate_comas" checked>
+    Advanced settings:
+    <br>
+    <input type="checkbox" id="separate_comas" name="separate_comas" value="separate_comas" {{ coma_cbox_status }}>
     <label for="separate_comas">Count punctuation as separate words</label>
     <br>
+    <input type="checkbox" id="remove_numbers" name="remove_numbers" value="remove_numbers" {{ numbers_cbox_status }}>
+    <label for="remove_numbers">Replace numbers with "NUMBER"</label>
+    <br>
 
+    <br>
     <input type="submit" value="Submit">
 </form>
 

@@ -1,7 +1,8 @@
 import random
+import re
 
 from collections import defaultdict
-from .rules import PREFERRED_PREPROCESSING
+from .text_preprocessing import normal_preprocessing
 
 def create_frequency_table(words, max_key_length, use_all_key_lengths):
   # use defaultdict to create dicts on access
@@ -29,12 +30,17 @@ def create_frequency_table(words, max_key_length, use_all_key_lengths):
 
 
 # returns generated text, selected prompt, and a reason for stopping generation
-def generate(table, prompt, max_text_length, max_key_length, split_by_punctuation):
+def generate(table, prompt, max_text_length, max_key_length,
+             remove_numbers, split_by_punctuation):
   # create prompt if there is none, use it if there is one
   if prompt == '':
-    prompt = PREFERRED_PREPROCESSING(random.choice(list(table)), split_by_punctuation)
+    prompt = normal_preprocessing(random.choice(list(table)),
+                                  remove_numbers,
+                                  split_by_punctuation)
   else:
-    prompt = PREFERRED_PREPROCESSING(prompt, split_by_punctuation)
+    prompt = normal_preprocessing(prompt,
+                                  remove_numbers,
+                                  split_by_punctuation)
     if prompt == '':
       raise Exception('Bad prompt!')
 
@@ -57,6 +63,19 @@ def generate(table, prompt, max_text_length, max_key_length, split_by_punctuatio
     # print(generated_words)
     key = ' '.join(generated_words[-max_key_length:])
 
-  generated_words = ' '.join(generated_words)
-  prompt = ' '.join(prompt)
+  generated_words = fix_generated_punctuation(' '.join(generated_words))
+  prompt = fix_generated_punctuation(' '.join(prompt))
   return generated_words, prompt, 'Reached the text length limit'
+
+
+# matches space and punctuation in "hello , friend"
+r = r'\s[^\w\"\(\)]'
+matcher = re.compile(r)
+def fix_generated_punctuation(s):
+  """ fixes strings like 'hello , friend' to 'hello, friend' """
+
+  def replacer(match):
+    return match.group().strip()
+
+  s = matcher.sub(replacer, s)
+  return s

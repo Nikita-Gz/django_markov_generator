@@ -4,13 +4,18 @@ from django.urls import reverse
 
 from .generator_code.rules import *
 from .generator_code.generator_functions import create_frequency_table, generate
+from .generator_code.text_preprocessing import normal_preprocessing
 
 def homepage(request: HttpRequest):
   # todo: make it a proper homepage maybe
   return HttpResponseRedirect(reverse('generator_app:text_input'))
 
 def text_input(request: HttpRequest):
-  context = {'entered_text_start': request.session.get('entered_text_start', '')}
+  context = {
+    'entered_text_start': request.session.get('entered_text_start', ''),
+    'coma_cbox_status': request.session.get('coma_cbox_status', ''),
+    'numbers_cbox_status': request.session.get('numbers_cbox_status', 'checked'),
+  }
 
   return render(request, 'generator_app/text_input.html', context)
 
@@ -24,14 +29,20 @@ def ask_to_enter_text_again(request: HttpRequest, message=None):
 
 def submit_input(request: HttpRequest):
   text = request.POST['typed_text']
+  separate_comas = 'separate_comas' in request.POST.keys()
+  replace_number = 'remove_numbers' in request.POST.keys()
 
-  processed = PREFERRED_PREPROCESSING(text, split_by_punctuation=PREFERRED_SPLIT_BY_PUNCTUATION)
+  processed = normal_preprocessing(text,
+                                  remove_numbers=replace_number,
+                                  split_by_punctuation=separate_comas)
   if len(processed) < MIN_PROMPT_TEXT_LENGTH_REQUIREMENT:
     return ask_to_enter_text_again(request)
 
   request.session['input_given'] = True
   request.session['entered_text_start'] = ' '.join(processed[:8]) + str('..')
   request.session['frequency_table'] = create_frequency_table(processed, MAX_KEY_LENGTH, True)
+  request.session['coma_cbox_status'] = (lambda: 'checked' if separate_comas else '')()
+  request.session['numbers_cbox_status'] = (lambda: 'checked' if replace_number else '')()
 
   # remove data from previous generations
   request.session['generated_text'] = ''
@@ -61,11 +72,15 @@ def generate_text(request: HttpRequest):
   text_length = int(request.POST['text_length'])
   key_length = int(request.POST['key_length'])
 
+  remove_numbers = request.session['numbers_cbox_status'] == 'checked'
+  split_by_punctuation = request.session['coma_cbox_status'] == 'checked'
   generator_output = generate(request.session['frequency_table'], request.session['last_prompt'],
-                              text_length, key_length, PREFERRED_SPLIT_BY_PUNCTUATION)
+                              text_length, key_length,
+                              remove_numbers,
+                              split_by_punctuation)
   generated_text, chosen_prompt, reason_for_stop = generator_output
 
-  # todo: delete whitespace between words and coma
+
   request.session['generated_text'] = generated_text
   request.session['last_prompt'] = chosen_prompt
   request.session['stop_reason'] = reason_for_stop

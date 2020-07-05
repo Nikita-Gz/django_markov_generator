@@ -2,8 +2,9 @@
 
 <br>
 Start of the text currently used for generation: {{ entered_text_start }}
-<a href="{% url 'generator_app:homepage' %}">Go back to homepage</a>
 <br>
+<a href="{% url 'generator_app:homepage' %}">Go back to homepage</a>
+<br><br>
 
 <form action="{% url 'generator_app:generate_text' %}" method="post" id='form'>
     {% csrf_token %}
