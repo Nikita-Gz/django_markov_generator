@@ -10,22 +10,20 @@ def homepage(request: HttpRequest):
   # todo: make it a proper homepage maybe
   return HttpResponseRedirect(reverse('generator_app:text_input'))
 
-def text_input(request: HttpRequest):
+def text_input(request: HttpRequest, error=''):
+  err_message = "Please enter some long text (at least {} words).".format(MIN_PROMPT_TEXT_LENGTH_REQUIREMENT)
+
   context = {
     'entered_text_start': request.session.get('entered_text_start', ''),
     'coma_cbox_status': request.session.get('coma_cbox_status', ''),
     'numbers_cbox_status': request.session.get('numbers_cbox_status', 'checked'),
+    'error_message': (lambda: '' if not error else err_message),
   }
 
   return render(request, 'generator_app/text_input.html', context)
 
-def ask_to_enter_text_again(request: HttpRequest, message=None):
-  if message is None:
-    message = "Please enter some long text (at least {} words).".format(MIN_PROMPT_TEXT_LENGTH_REQUIREMENT)
-
-  return render(request, 'generator_app/text_input.html', {
-    'error_message': message,
-  })
+def ask_to_enter_text_again(request: HttpRequest):
+  return HttpResponseRedirect(reverse('generator_app:text_input_err', args=('fuck',)))
 
 def submit_input(request: HttpRequest):
   text = request.POST['typed_text']
@@ -36,7 +34,7 @@ def submit_input(request: HttpRequest):
                                   remove_numbers=replace_number,
                                   split_by_punctuation=separate_comas)
   if len(processed) < MIN_PROMPT_TEXT_LENGTH_REQUIREMENT:
-    return ask_to_enter_text_again(request)
+    return HttpResponseRedirect(reverse('generator_app:text_input_err', args=('fuck',)))
 
   request.session['input_given'] = True
   request.session['entered_text_start'] = ' '.join(processed[:8]) + str('..')
@@ -53,7 +51,7 @@ def submit_input(request: HttpRequest):
 
 def generator_page(request: HttpRequest):
   if not request.session.get('input_given', False):
-    return ask_to_enter_text_again(request)
+    return HttpResponseRedirect(reverse('generator_app:text_input_err', args=('fuck',)))
 
   context = {
     'last_prompt': request.session['last_prompt'],
@@ -88,29 +86,6 @@ def generate_text(request: HttpRequest):
   request.session['text_length'] = request.POST['text_length']
 
   return HttpResponseRedirect(reverse('generator_app:generator_page'))
-
-def count_substrings_page(request: HttpRequest):
-  text = request.session.get('preprocessed_text', None)
-  if text is None:
-    return ask_to_enter_text_again(request)
-
-  text_start = text
-  if len(text_start) > 15:
-    text_start = text_start[:13] + '...'
-
-  occurance_count = request.session.get('occurance_count', 0)
-  context = {'text_start': text_start,
-             'occurance_count': occurance_count}
-
-  return render(request, 'generator_app/substring_counting.html', context)
-
-def count_substrings(request: HttpRequest):
-  substring = request.POST['substring'] # type: str
-  string = request.session.get('preprocessed_text', None) # type: str
-
-  count = string.count(substring)
-  request.session['occurance_count'] = count
-  return HttpResponseRedirect(reverse('generator_app:count_substrings_page'))
 
 def clear_session(request: HttpRequest):
   request.session.flush()
