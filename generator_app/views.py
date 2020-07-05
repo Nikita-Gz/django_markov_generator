@@ -26,9 +26,13 @@ def ask_to_enter_text_again(request: HttpRequest):
   return HttpResponseRedirect(reverse('generator_app:text_input_err', args=('fuck',)))
 
 def submit_input(request: HttpRequest):
-  text = request.POST['typed_text']
   separate_comas = 'separate_comas' in request.POST.keys()
   replace_number = 'remove_numbers' in request.POST.keys()
+
+  if 'txt_file' in request.FILES:
+    text = "".join(map(chr, request.FILES['txt_file'].read()))
+  else:
+    text = request.POST['typed_text']
 
   processed = normal_preprocessing(text,
                                   remove_numbers=replace_number,

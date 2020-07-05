@@ -13,7 +13,8 @@ No text for use in generation was entered yet!
 
 {% if error_message %}<p style="color:rgb(255,0,0);"><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'generator_app:submit_input' %}" method="post" id='text_form'>
+<form action="{% url 'generator_app:submit_input' %}" method="post" id='text_form'
+enctype="multipart/form-data">
     {% csrf_token %}
     <label for="typed_text">Enter text here:</label><br>
     <textarea rows = "8" cols = "80" name = "typed_text" id="typed_text"></textarea>
