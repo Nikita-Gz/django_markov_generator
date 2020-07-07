@@ -10,6 +10,7 @@ def homepage(request: HttpRequest):
   # todo: make it a proper homepage maybe
   return HttpResponseRedirect(reverse('generator_app:text_input'))
 
+
 def text_input(request: HttpRequest, error_name=''):
   if error_name != '':
     err_message = rules.error_descriptions.get(error_name, 'unknown error')
@@ -25,8 +26,10 @@ def text_input(request: HttpRequest, error_name=''):
 
   return render(request, 'generator_app/text_input.html', context)
 
+
 def ask_to_enter_text_again(error_name: str):
   return HttpResponseRedirect(reverse('generator_app:text_input_err', args=(error_name,)))
+
 
 def submit_input(request: HttpRequest):
   separate_comas = 'separate_comas' in request.POST.keys()
@@ -44,6 +47,7 @@ def submit_input(request: HttpRequest):
   processed = normal_preprocessing(text,
                                   remove_numbers=replace_number,
                                   split_by_punctuation=separate_comas)
+
   if len(processed) < rules.MIN_PROMPT_TEXT_LENGTH_REQUIREMENT:
     return ask_to_enter_text_again('bad_input')
 
@@ -53,12 +57,13 @@ def submit_input(request: HttpRequest):
   request.session['coma_cbox_status'] = (lambda: 'checked' if separate_comas else '')()
   request.session['numbers_cbox_status'] = (lambda: 'checked' if replace_number else '')()
 
-  # remove data from previous generations
+  # remove data from previous text generations
   request.session['generated_text'] = ''
   request.session['last_prompt'] = ''
   request.session['stop_reason'] = ''
 
   return HttpResponseRedirect(reverse('generator_app:generator_page'))
+
 
 def generator_page(request: HttpRequest):
   if not request.session.get('input_given', False):
@@ -75,7 +80,8 @@ def generator_page(request: HttpRequest):
 
   return render(request, 'generator_app/generator.html', context)
 
-def generate_text(request: HttpRequest):
+
+def submit_generate_text(request: HttpRequest):
   request.session['last_prompt'] = request.POST['prompt']
 
   text_length = int(request.POST['text_length'])
@@ -84,7 +90,8 @@ def generate_text(request: HttpRequest):
   remove_numbers = request.session['numbers_cbox_status'] == 'checked'
   split_by_punctuation = request.session['coma_cbox_status'] == 'checked'
   generator_output = generate(request.session['frequency_table'], request.session['last_prompt'],
-                              text_length, key_length,
+                              text_length,
+                              key_length,
                               remove_numbers,
                               split_by_punctuation)
   generated_text, chosen_prompt, reason_for_stop = generator_output
@@ -98,10 +105,11 @@ def generate_text(request: HttpRequest):
 
   return HttpResponseRedirect(reverse('generator_app:generator_page'))
 
+
 def clear_session(request: HttpRequest):
   request.session.flush()
   return HttpResponseRedirect(reverse('generator_app:homepage'))
 
+
 def ded(request: HttpRequest):
   raise Exception('BAD BAD BAD BAD')
-  return HttpResponse("BAD")

@@ -5,19 +5,22 @@ from .generator_code.generator_functions import fix_generated_punctuation
 
 
 def generate_strings_for_default_preprocessing():
-  # returns list of pairs of input strings and target preprocessed strings
-  # (with replaced numbers)
+  """
+  returns list of pairs of input strings and target preprocessed strings
+  (with replaced numbers)
+  """
   strings = [('  Oi,   ohh\nOhOh ', ['oi', ',', 'ohh', '.', 'ohoh']),
              ('Hey! ', ['hey', '!']),
              ('Hey!! ! How are you??', ['hey', '!', 'how', 'are', 'you', '?']),
              ('oh... weird..', ['oh', '.', 'weird', '.']),
              ('Its 1.23*10^-34km away. 5th', ['its', 'NUMBER', 'away', '.', 'NUMBER']),
-             ('That will be 5.99$ please', ['that', 'will', 'be', 'NUMBER', 'please'])
+             ('That will be 5.99$, please', ['that', 'will', 'be', 'NUMBER', ',', 'please'])
              ]
 
   return strings
 
 
+# todo: maybe add more generator tests
 class GeneratorFunctionsTests(TestCase):
 
   def test_fixing_generated_punctuation(self):
@@ -43,8 +46,10 @@ class PreprocessingTests(TestCase):
       self.assertEqual(processed, target_str)
 
   def test_preprocessing_without_punctuation_split(self):
-    """ test preprocessing without punctuation splitting """
-    """ relies on test test_fixing_generated_punctuation() to be successful """
+    """
+    test preprocessing without punctuation splitting
+    relies on test test_fixing_generated_punctuation() to be successful
+    """
     input_strings, target_strings = zip(*generate_strings_for_default_preprocessing())
     input_strings, target_strings = list(input_strings), list(target_strings)
 
