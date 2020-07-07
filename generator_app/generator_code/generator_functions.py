@@ -85,8 +85,7 @@ def generate(table: dict, prompt: str, max_text_length: int,
     if prompt == '':
       raise Exception('Bad prompt!')
 
-  # todo: reduce prompt to the max used length before assigning it as key
-  key = ' '.join(prompt)
+  key = ' '.join(prompt[-max_used_key_length:])
   generated_words = prompt.copy()
   for i in range(max_text_length):
 
